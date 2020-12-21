@@ -58,11 +58,15 @@ class Config(object):
             self.CONFIG = os.path.expanduser("~")+r"/.youtube-gui" # Rename this ... alternative for linux or Unix based systems
         self.config = {}
         self.fallback = {
-            "background": "grey",
+            "background": "#1c1c1c",
+            "foreground": "#ffffff",
             "songs": {},
             "format": "",
             "directory": "",
-            "output": ""
+            "output": "",
+            "font": ("Arial", "10", "bold"),
+            "accent": "yellow",
+            "highlightthickness": 1
         }
 
     def save(self):
@@ -82,8 +86,9 @@ class Config(object):
         try:
             return self.config[name]
         except:
-            self.print_timestamp(f"{c.bold}{name}{c.end} {c.warning}Not found in config, trying to get from fallback{c.end}")
+            self.print_timestamp(f"{c.bold}{name}{c.end} {c.warning}not found in config, trying to get from fallback{c.end}")
             self.config[name] = self.fallback[name]
+            self.save()
             return self.fallback[name]
 
     def __setitem__(self, key: str, val):
@@ -100,53 +105,57 @@ config.load()
 
 class Application(tk.Frame):
     def __init__(self, master=None):
-        super().__init__(master, height=42, width=42, background=config["background"])
+        super().__init__(master, height=42, width=42, bg=config["background"])
         self.master = master
         self.pack()
         self.create_widgets()
         self.directory = "."
 
     def create_widgets(self):
-        self.urllabel = tk.Label(self, text="URL to download", background=config["background"])
+        self.urllabel = tk.Label(self, text="URL to download", bg=config["background"], fg=config["foreground"], font=config["font"])
         self.urllabel.pack()
-        self.userInput = tk.Entry(self, width=90)
-        self.userInput.pack()
 
-        self.Addbutton = tk.Button(self,width=20)
+        self.urlframe = tk.Frame(self, bg=config["background"])
+        self.urlframe.pack()
+        self.userInput = tk.Entry(self, width=60, font=config["font"], highlightbackground=config["accent"], fg="white", bg=config["background"], highlightthickness=config["highlightthickness"])
+        self.userInput.pack(in_=self.urlframe, side=tk.LEFT)
+        self.Addbutton = tk.Button(self,width=20, font=config["font"], highlightbackground=config["accent"], fg="white", bg=config["background"])
         self.Addbutton["text"] = "Add"
         self.Addbutton["command"] = self.appendURL
-        self.Addbutton.pack()
+        self.Addbutton.pack(in_=self.urlframe, side=tk.LEFT)
 
-        self.list = tk.Listbox(self, width=100, height=30)
+        self.list = tk.Listbox(self, width=100, height=30, fg="white", bg=config["background"], font=config["font"], highlightbackground=config["accent"])
         self.list.insert(0, *config["songs"])
         self.list.pack()
 
-        self.remove_from_list = tk.Button(self,width=20)
+        self.remove_from_list = tk.Button(self,width=20, font=config["font"], highlightbackground=config["accent"], fg="white", bg=config["background"])
         self.remove_from_list["text"] = "remove"
         self.remove_from_list["command"] = self.remove
         self.remove_from_list.pack(pady=2)
 
-        self.formatlabel = tk.Label(self, text="Youtube format", background=config["background"])
+        self.formatlabel = tk.Label(self, text="Youtube format", bg=config["background"], fg=config["foreground"], font=config["font"], highlightbackground=config["accent"])
         self.formatlabel.pack()
-        self.format = tk.Entry(self, width=90)
+        self.format = tk.Entry(self, width=90, font=config["font"], highlightbackground=config["accent"], fg="white", bg=config["background"], highlightthickness=1)
         self.format.insert("1", config["format"])
         self.format.pack()
 
-        self.outputlabel = tk.Label(self, text="Output format", background=config["background"])
+        self.outputlabel = tk.Label(self, text="Output format", bg=config["background"], fg=config["foreground"], font=config["font"], highlightbackground=config["accent"])
         self.outputlabel.pack()
-        self.output = tk.Entry(self, width=90)
+        self.output = tk.Entry(self, width=90, font=config["font"], highlightbackground=config["accent"], fg="white", bg=config["background"], highlightthickness=1)
         self.output.insert("1", config["output"])
         self.output.pack()
 
-        self.outputlabel = tk.Label(self, text="Directory", background=config["background"])
+        self.outputlabel = tk.Label(self, text="Directory", bg=config["background"], fg=config["foreground"], font=config["font"], highlightbackground=config["accent"])
         self.outputlabel.pack()
-        self.direntry = tk.Entry(self, width=90)
+        self.dirframe = tk.Frame(self, bg=config["background"])
+        self.dirframe.pack()
+        self.direntry = tk.Entry(self, width=60, font=config["font"], highlightbackground=config["accent"], fg="white", bg=config["background"], highlightthickness=1)
         self.direntry.insert("1", config["directory"])
-        self.direntry.pack()
-        self.files = tk.Button(self, text="Browse", command=self.dir)
-        self.files.pack()
+        self.direntry.pack(in_=self.dirframe, side=tk.LEFT)
+        self.files = tk.Button(self, text="Browse", command=self.dir, font=config["font"], highlightbackground=config["accent"], fg="white", bg=config["background"])
+        self.files.pack(in_=self.dirframe, side=tk.LEFT)
 
-        self.convert_button = tk.Button(self,width=20)
+        self.convert_button = tk.Button(self,width=20, font=config["font"], highlightbackground=config["accent"], fg="white", bg=config["background"])
         self.convert_button["text"] = "Convert"
         self.convert_button["command"] = self.download
         self.convert_button.pack(pady=8)
