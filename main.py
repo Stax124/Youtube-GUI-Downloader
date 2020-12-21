@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, ttk
 import youtube_dl
 import os
 import datetime
@@ -106,10 +106,12 @@ config.load()
 class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master, height=42, width=42, bg=config["background"])
+        self.style = ttk.Style()
+        self.style.theme_use("clam")
         self.master = master
         self.pack()
-        self.create_widgets()
         self.directory = "."
+        self.create_widgets()
 
     def create_widgets(self):
         self.urllabel = tk.Label(self, text="URL to download", bg=config["background"], fg=config["foreground"], font=config["font"])
@@ -119,7 +121,7 @@ class Application(tk.Frame):
         self.urlframe.pack()
         self.userInput = tk.Entry(self, width=60, font=config["font"], highlightbackground=config["accent"], fg="white", bg=config["background"], highlightthickness=config["highlightthickness"])
         self.userInput.pack(in_=self.urlframe, side=tk.LEFT)
-        self.Addbutton = tk.Button(self,width=20, font=config["font"], highlightbackground=config["accent"], fg="white", bg=config["background"])
+        self.Addbutton = tk.Button(self, font=config["font"], fg="white", bg=config["background"])
         self.Addbutton["text"] = "Add"
         self.Addbutton["command"] = self.appendURL
         self.Addbutton.pack(in_=self.urlframe, side=tk.LEFT)
