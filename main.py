@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import filedialog, ttk
+from tkinter import filedialog
 import youtube_dl
 import os
 import datetime
@@ -106,8 +106,6 @@ config.load()
 class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master, height=42, width=42, bg=config["background"])
-        self.style = ttk.Style()
-        self.style.theme_use("clam")
         self.master = master
         self.pack()
         self.directory = "."
