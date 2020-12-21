@@ -128,10 +128,16 @@ class Application(tk.Frame):
         self.list.insert(0, *config["songs"])
         self.list.pack()
 
+        self.bottomframe = tk.Frame(self, bg=config["background"])
+        self.bottomframe.pack()
         self.remove_from_list = tk.Button(self,width=20, font=config["font"], highlightbackground=config["accent"], fg="white", bg=config["background"])
-        self.remove_from_list["text"] = "remove"
+        self.remove_from_list["text"] = "Remove"
         self.remove_from_list["command"] = self.remove
-        self.remove_from_list.pack(pady=2)
+        self.remove_from_list.pack(pady=2, in_=self.bottomframe, side=tk.LEFT)
+        self.get_formats = tk.Button(self,width=20, font=config["font"], highlightbackground=config["accent"], fg="white", bg=config["background"])
+        self.get_formats["text"] = "Formats"
+        self.get_formats["command"] = self.formats
+        self.get_formats.pack(pady=2, in_=self.bottomframe, side=tk.LEFT)
 
         self.formatlabel = tk.Label(self, text="Youtube format", bg=config["background"], fg=config["foreground"], font=config["font"], highlightbackground=config["accent"])
         self.formatlabel.pack()
@@ -165,6 +171,20 @@ class Application(tk.Frame):
         config.save()
         self.list.delete(self.list.curselection())
 
+    def formats(self):
+        try:
+            target = self.list.get(self.list.curselection())
+        except:
+            print_timestamp(f"{c.fail}No URL selected from list{c.end}")
+            return
+        print_timestamp(f"{c.bold}Getting available formats for:{c.end} {c.warning}{target}{c.end}")
+
+        opts = {
+            "listformats": True
+        }
+        downloader = youtube_dl.YoutubeDL(opts)
+        downloader.download([target])
+
     def appendURL(self):
         data = self.userInput.get()
         if data != "":
@@ -182,7 +202,6 @@ class Application(tk.Frame):
             ids.append(match)
 
         ids = list(dict.fromkeys(ids))
-        print(ids)
 
         l = list(self.list.get(0,tk.END))
         urls = []
@@ -194,9 +213,10 @@ class Application(tk.Frame):
                     urls.pop(urls.index(url))
 
         config["output"] = self.output.get()
+        config["format"] = self.format.get()
 
         opts = {
-            "format": self.format.get() if self.format.get() != "" else "bestaudio",
+            "format": self.format.get() if self.format.get() != "" else None,
             "noplaylist": False,
             "continuedl": True,
             'postprocessors': [{
